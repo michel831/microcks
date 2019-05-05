@@ -88,7 +88,7 @@ public class TestService {
     */
    public TestCaseResult reportTestCaseResult(String testResultId, String operationName, List<TestReturn> testReturns) {
       log.info("Reporting a TestCaseResult for testResult {} on operation '{}'", testResultId, operationName);
-      TestResult testResult = testResultRepository.findOne(testResultId);
+      TestResult testResult = testResultRepository.findById(testResultId).get();
       TestCaseResult updatedTestCaseResult = null;
 
       // This part can be done safely with no race condition because we only
@@ -142,7 +142,7 @@ public class TestService {
             log.warn("Caught an OptimisticLockingFailureException, trying refreshing for {} times", times);
             saved = false;
             waitSomeRandomMS(5, 50);
-            testResult = testResultRepository.findOne(testResult.getId());
+            testResult = testResultRepository.findById(testResult.getId()).get();
             times++;
          }
       }
@@ -166,14 +166,14 @@ public class TestService {
 
       // Save the responses into repository to get their ids.
       log.debug("Saving {} responses with testCaseId {}", responses.size(), testCaseId);
-      responseRepository.save(responses);
+      responseRepository.saveAll(responses);
 
       // Associate responses to requests before saving requests.
       for (int i=0; i<actualRequests.size(); i++){
          actualRequests.get(i).setResponseId(responses.get(i).getId());
       }
       log.debug("Saving {} requests with testCaseId {}", responses.size(), testCaseId);
-      requestRepository.save(actualRequests);
+      requestRepository.saveAll(actualRequests);
    }
    
    /**

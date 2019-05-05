@@ -18,33 +18,49 @@
  */
 package io.github.microcks.repository;
 
-import com.github.fakemongo.Fongo;
-import com.mongodb.Mongo;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
+
+import de.bwaldvogel.mongo.MongoServer;
+import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
 /**
  * Spring configuration for repositories tests.
+ * 
  * @author laurent
  */
 @Configuration
-@ComponentScan(basePackages = {"io.github.microcks.service"})
-@EnableMongoRepositories(basePackages = {"io.github.microcks.repository"})
-public class RepositoryTestsConfiguration extends AbstractMongoConfiguration {
+@ComponentScan(basePackages = { "io.github.microcks.service" })
+@EnableMongoRepositories(basePackages = { "io.github.microcks.repository" })
+public class RepositoryTestsConfiguration/* extends AbstractMongoConfiguration*/ {
 
-   @Override
-   protected String getDatabaseName() {
-      return "demo-test";
-   }
-   @Override
-   public Mongo mongo() {
-      // Uses Fongo for in-memory tests.
-      return new Fongo("mongo-test").getMongo();
-   }
-   @Override
-   protected String getMappingBasePackage() {
-      return "com.github.lbroudoux.microcks.domain";
-   }
+	@Bean
+    public MongoTemplate mongoTemplate(MongoClient mongoClient) {
+        return new MongoTemplate(mongoDbFactory(mongoClient));
+    }
+
+    @Bean
+    public MongoDbFactory mongoDbFactory(MongoClient mongoClient) {
+        return new SimpleMongoDbFactory(mongoClient, "test");
+    }
+
+    @Bean(destroyMethod="shutdown")
+    public MongoServer mongoServer() {
+        MongoServer mongoServer = new MongoServer(new MemoryBackend());
+        mongoServer.bind();
+        return mongoServer;
+    }
+
+    @Bean(destroyMethod="close")
+    public MongoClient mongoClient(MongoServer mongoServer) {
+        return new MongoClient(new ServerAddress(mongoServer.getLocalAddress()));
+    }
 }

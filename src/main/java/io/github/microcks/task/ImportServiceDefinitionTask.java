@@ -92,7 +92,7 @@ public class ImportServiceDefinitionTask {
                Secret jobSecret = null;
                if (job.getSecretRef() != null) {
                   log.debug("Retrieving secret {} for job {}", job.getSecretRef().getName(), job.getName());
-                  jobSecret = secretRepository.findOne(job.getSecretRef().getSecretId());
+                  jobSecret = secretRepository.findById(job.getSecretRef().getSecretId()).get();
                }
 
                // Get older and fresh Etag if any.

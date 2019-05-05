@@ -88,7 +88,7 @@ public class SecretController {
    @RequestMapping(value = "/secrets/{id}", method = RequestMethod.DELETE)
    public ResponseEntity<String> deleteService(@PathVariable("id") String secretId) {
       log.debug("Removing secret with id {}", secretId);
-      secretRepository.delete(secretId);
+      secretRepository.deleteById(secretId);
       return new ResponseEntity<>(HttpStatus.OK);
    }
 }

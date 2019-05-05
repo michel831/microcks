@@ -177,14 +177,14 @@ public class TestRunnerService {
 
       // Save the responses into repository to get their ids.
       log.debug("Saving {} responses with testCaseId {}", responses.size(), testCaseId);
-      responseRepository.save(responses);
+      responseRepository.saveAll(responses);
 
       // Associate responses to requests before saving requests.
       for (int i=0; i<actualRequests.size(); i++){
          actualRequests.get(i).setResponseId(responses.get(i).getId());
       }
       log.debug("Saving {} requests with testCaseId {}", responses.size(), testCaseId);
-      requestRepository.save(actualRequests);
+      requestRepository.saveAll(actualRequests);
 
       // Update and save the completed TestCaseResult.
       // We cannot consider as success if we have no TestStepResults associated...
@@ -298,7 +298,7 @@ public class TestRunnerService {
       Secret jobSecret = null;
       if (job.getSecretRef() != null) {
          log.debug("Retrieving secret {} for job {}", job.getSecretRef().getName(), job.getName());
-         jobSecret = secretRepository.findOne(job.getSecretRef().getSecretId());
+         jobSecret = secretRepository.findById(job.getSecretRef().getSecretId()).get();
       }
 
       File localFile = HTTPDownloader.handleHTTPDownloadToFile(job.getRepositoryUrl(),

@@ -119,7 +119,7 @@ public class ServiceController {
          }
          service = serviceRepository.findByNameAndVersion(name, version);
       } else {
-         service = serviceRepository.findOne(serviceId);
+         service = serviceRepository.findById(serviceId).get();
       }
 
       if (messages) {

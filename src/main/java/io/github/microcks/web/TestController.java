@@ -96,7 +96,7 @@ public class TestController {
          String version = test.getServiceId().substring(test.getServiceId().indexOf(':') + 1);
          service = serviceRepository.findByNameAndVersion(name, version);
       } else {
-         service = serviceRepository.findOne(test.getServiceId());
+         service = serviceRepository.findById(test.getServiceId()).get();
       }
       TestRunnerType testRunner = TestRunnerType.valueOf(test.getRunnerType());
       // Build additional header entries for operations.
@@ -108,7 +108,7 @@ public class TestController {
    @RequestMapping(value = "/tests/{id}", method = RequestMethod.GET)
    public ResponseEntity<TestResult> getTestResult(@PathVariable("id") String testResultId) {
       log.debug("Getting TestResult with id {}", testResultId);
-      return new ResponseEntity<>(testResultRepository.findOne(testResultId), HttpStatus.OK);
+      return new ResponseEntity<>(testResultRepository.findById(testResultId).get(), HttpStatus.OK);
    }
 
    @RequestMapping(value = "tests/{id}/messages/{testCaseId}", method = RequestMethod.GET)
